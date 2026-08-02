@@ -89,26 +89,25 @@ function App() {
       try {
         const code = roomCodeFromPath()
 
-        let response: RoomResponse
+        let response: RoomResponse | null = null
 
         if (code) {
           const roomResponse = await fetch(`${apiUrl}/api/rooms/${code}/claim`, {
             method: 'POST',
           })
-          if (!roomResponse.ok) throw new Error('Unavailable')
-          response = (await roomResponse.json()) as RoomResponse
-        } else if (window.location.pathname === '/') {
+          if (roomResponse.ok) response = (await roomResponse.json()) as RoomResponse
+        }
+
+        if (!response) {
           const roomResponse = await fetch(`${apiUrl}/api/rooms`, { method: 'POST' })
           if (!roomResponse.ok) throw new Error('Creation failed')
           response = (await roomResponse.json()) as RoomResponse
-        } else {
-          throw new Error('Invalid link')
         }
 
         if (!cancelled) await enterRoom(response)
       } catch {
         if (!cancelled) {
-          setError('This link is unavailable. Open the root URL to create a new one.')
+          setError('Could not create a new link. Please try again.')
           setStatus('Unable to connect')
         }
       } finally {
