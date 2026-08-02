@@ -73,6 +73,25 @@ function App() {
   const keyRef = useRef<CryptoKey | null>(null)
   const textareaRef = useRef<HTMLTextAreaElement | null>(null)
   const copiedTimerRef = useRef<number | null>(null)
+  const participantsRef = useRef<HTMLDivElement | null>(null)
+
+  useEffect(() => {
+    if (!showParticipants) return
+    const onPointerDown = (event: PointerEvent) => {
+      if (participantsRef.current && !participantsRef.current.contains(event.target as Node)) {
+        setShowParticipants(false)
+      }
+    }
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setShowParticipants(false)
+    }
+    document.addEventListener('pointerdown', onPointerDown)
+    document.addEventListener('keydown', onKeyDown)
+    return () => {
+      document.removeEventListener('pointerdown', onPointerDown)
+      document.removeEventListener('keydown', onKeyDown)
+    }
+  }, [showParticipants])
 
   useEffect(() => {
     let cancelled = false
@@ -315,9 +334,14 @@ function App() {
             paste<span className="text-[#78951d] dark:text-[#d2f36b]">paste</span>
           </div>
           <div className="flex items-center gap-3 text-xs text-[#687064] dark:text-[#989c91]">
-            <span className="hidden sm:inline">{status}</span>
+            <span className="hidden items-center gap-1.5 sm:flex">
+              {status === 'Connected' && (
+                <span className="breathe inline-block h-2 w-2 rounded-full bg-[#5fbf47]" />
+              )}
+              {status}
+            </span>
             {participants.length > 0 && (
-              <div className="relative">
+              <div className="relative" ref={participantsRef}>
                 <button
                   onClick={() => setShowParticipants((value) => !value)}
                   className="rounded-lg border border-black/10 px-3 py-2 font-medium text-[#30372b] transition hover:border-[#a9c94f] hover:bg-white dark:border-white/10 dark:text-[#d5d8ce] dark:hover:bg-white/5"

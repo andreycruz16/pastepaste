@@ -25,6 +25,22 @@ body {
   min-width: 320px;
 }
 
+@keyframes breathe {
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.breathe {
+  animation: breathe 2.4s ease-in-out infinite;
+}
+
 @keyframes toast-in {
   from {
     opacity: 0;
