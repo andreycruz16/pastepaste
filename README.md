@@ -21,6 +21,18 @@ npm run dev
 
 The frontend uses `http://localhost:8080` by default. Copy `.env.example` to `.env.local` if a different backend URL is needed.
 
+## Docker
+
+Build and push the API image:
+
+```bash
+docker buildx build \
+  --platform linux/amd64 \
+  -t andreycruz16/pastepaste-api:latest \
+  -t andreycruz16/pastepaste-api:$(git rev-parse --short HEAD) \
+  --push .
+```
+
 ## Architecture
 
 - React, TypeScript, Vite, and Tailwind CSS frontend
