@@ -25,6 +25,18 @@ app.MapGet("/health", () => Results.Ok(new { status = "ok" }));
 
 app.MapPost("/api/rooms", (RoomService rooms) => Results.Ok(rooms.CreateRoom()));
 
+app.MapPut("/api/rooms/{roomCode}", (string roomCode, RoomService rooms) =>
+{
+    var room = rooms.CreateRoom(roomCode);
+    return room is null ? Results.Conflict() : Results.Ok(room);
+});
+
+app.MapPost("/api/rooms/{roomCode}/claim", (string roomCode, RoomService rooms) =>
+{
+    var room = rooms.GetOrCreateRoom(roomCode);
+    return room is null ? Results.BadRequest() : Results.Ok(room);
+});
+
 app.MapPost("/api/rooms/{roomCode}", (string roomCode, RoomService rooms) =>
 {
     var room = rooms.GetRoom(roomCode.Trim().ToUpperInvariant());

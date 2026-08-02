@@ -16,14 +16,33 @@ public sealed class RoomService
         {
             var code = string.Concat(Enumerable.Range(0, 5)
                 .Select(_ => Alphabet[RandomNumberGenerator.GetInt32(Alphabet.Length)]));
-            var room = new RoomState
-            {
-                RoomCode = code,
-                Salt = Convert.ToBase64String(RandomNumberGenerator.GetBytes(16)),
-            };
 
-            if (_rooms.TryAdd(code, room)) return room.ToResponse();
+            var response = CreateRoom(code);
+            if (response is not null) return response;
         }
+    }
+
+    public RoomResponse? CreateRoom(string roomCode)
+    {
+        var code = roomCode.Trim().ToUpperInvariant();
+        if (code.Length != 5 || !code.All(character => Alphabet.Contains(character))) return null;
+
+        var room = new RoomState
+        {
+            RoomCode = code,
+            Salt = Convert.ToBase64String(RandomNumberGenerator.GetBytes(16)),
+        };
+
+        return _rooms.TryAdd(code, room) ? room.ToResponse() : null;
+    }
+
+    public RoomResponse? GetOrCreateRoom(string roomCode)
+    {
+        var code = roomCode.Trim().ToUpperInvariant();
+        if (code.Length != 5 || !code.All(character => Alphabet.Contains(character))) return null;
+
+        if (_rooms.TryGetValue(code, out var existingRoom)) return existingRoom.ToResponse();
+        return CreateRoom(code) ?? _rooms.GetValueOrDefault(code)?.ToResponse();
     }
 
     public RoomState? GetRoom(string roomCode) =>
