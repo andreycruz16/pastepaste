@@ -23,13 +23,23 @@ The frontend uses `http://localhost:8080` by default. Copy `.env.example` to `.e
 
 ## Docker
 
-Build and push the API image:
+Build and push the API image to Docker Hub:
 
 ```bash
 docker buildx build \
-  --platform linux/amd64 \
+  --platform linux/amd64,linux/arm64 \
   -t andreycruz16/pastepaste-api:latest \
   -t andreycruz16/pastepaste-api:$(git rev-parse --short HEAD) \
+  --push .
+```
+
+And to GitHub Container Registry:
+
+```bash
+docker buildx build \
+  --platform linux/amd64,linux/arm64 \
+  -t ghcr.io/andreycruz16/pastepaste-api:latest \
+  -t ghcr.io/andreycruz16/pastepaste-api:$(git rev-parse --short HEAD) \
   --push .
 ```
 
