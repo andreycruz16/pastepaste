@@ -408,7 +408,7 @@ function App() {
           <div className="mb-4 flex items-center justify-between gap-3">
             {myName && (
               <p className="text-sm font-medium text-[#687064] dark:text-[#989c91]">
-                You are <span className="text-[#30372b] dark:text-[#d5d8ce]">{myName}</span>
+                You are <span className="font-bold text-[#78951d] dark:text-[#d2f36b]">{myName}</span>
               </p>
             )}
             <div className="flex items-center gap-3">
