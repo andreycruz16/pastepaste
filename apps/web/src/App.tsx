@@ -12,6 +12,7 @@ import {
   disconnectFromRoom,
   sendClipboard,
 } from './lib/realtime'
+import QRCodeModal from './components/QRCodeModal'
 
 const apiUrl = import.meta.env.VITE_API_URL ?? 'http://localhost:5080'
 
@@ -62,16 +63,16 @@ function App() {
   const [myName, setMyName] = useState<string | null>(null)
   const [participants, setParticipants] = useState<string[]>([])
   const [showParticipants, setShowParticipants] = useState(false)
+  const [showQr, setShowQr] = useState(false)
   const [dark, setDark] = useState(() => {
     const stored = localStorage.getItem('theme')
-    return stored
-      ? stored === 'dark'
-      : window.matchMedia('(prefers-color-scheme: dark)').matches
+    return stored ? stored === 'dark' : true
   })
   const activeRoomRef = useRef<RoomResponse | null>(null)
   const connectionRef = useRef<HubConnection | null>(null)
   const keyRef = useRef<CryptoKey | null>(null)
   const textareaRef = useRef<HTMLTextAreaElement | null>(null)
+  const copiedTimerRef = useRef<number | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -128,6 +129,12 @@ function App() {
     localStorage.setItem('theme', dark ? 'dark' : 'light')
   }, [dark])
 
+  useEffect(() => {
+    return () => {
+      if (copiedTimerRef.current !== null) window.clearTimeout(copiedTimerRef.current)
+    }
+  }, [])
+
   async function createNewRoom() {
     setBusy(true)
     setError('')
@@ -172,6 +179,7 @@ function App() {
     setMyName(null)
     setParticipants([])
     setShowParticipants(false)
+    setCopied(null)
 
     const key = await deriveRoomKey(response.roomCode, response.salt)
     const connection = createConnection()
@@ -222,14 +230,55 @@ function App() {
     }
   }
 
+  function showCopied(target: 'code' | 'link') {
+    setCopied(target)
+    if (copiedTimerRef.current !== null) window.clearTimeout(copiedTimerRef.current)
+    copiedTimerRef.current = window.setTimeout(() => {
+      setCopied(null)
+      copiedTimerRef.current = null
+    }, 2000)
+  }
+
   async function copy(value: string, target: 'code' | 'link') {
+    const fallback = () => {
+      const el = document.createElement('textarea')
+      el.value = value
+      el.style.position = 'fixed'
+      el.style.opacity = '0'
+      document.body.appendChild(el)
+      el.select()
+      const ok = document.execCommand('copy')
+      document.body.removeChild(el)
+      return ok
+    }
+
     try {
-      await navigator.clipboard.writeText(value)
-      setCopied(target)
-      window.setTimeout(() => setCopied(null), 1600)
+      if (!navigator.clipboard?.writeText) {
+        if (!fallback()) throw new Error('Copy failed')
+      } else {
+        try {
+          await navigator.clipboard.writeText(value)
+        } catch {
+          if (!fallback()) throw new Error('Copy failed')
+        }
+      }
+      showCopied(target)
     } catch {
       setError('Could not copy. Please copy it manually instead.')
     }
+  }
+
+  async function shareRoom() {
+    const url = window.location.href
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: 'Pastepaste', text: 'Join my Pastepaste room', url })
+        return
+      } catch {
+        // user dismissed the share sheet or sharing failed; fall back to copy
+      }
+    }
+    await copy(url, 'link')
   }
 
   if (!activeRoom) {
@@ -272,8 +321,8 @@ function App() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f8f8f5] px-5 py-6 text-[#171a12] dark:bg-[#10110f] dark:text-[#e8e5df] sm:px-8 sm:py-8">
-      <div className="mx-auto flex min-h-[calc(100svh-3rem)] max-w-5xl flex-col">
+    <main className="h-dvh overflow-hidden bg-[#f8f8f5] px-5 py-6 text-[#171a12] dark:bg-[#10110f] dark:text-[#e8e5df] sm:px-8 sm:py-8">
+      <div className="mx-auto flex h-full min-h-0 max-w-5xl flex-col">
         <header className="flex items-center justify-between border-b border-black/10 pb-6 dark:border-white/10">
           <div className="text-2xl font-bold tracking-[-0.055em] text-[#171a12] dark:text-[#e8e5df]">
             paste<span className="text-[#78951d] dark:text-[#d2f36b]">paste</span>
@@ -310,40 +359,82 @@ function App() {
                 )}
               </div>
             )}
+            <button
+              onClick={() => setShowQr(true)}
+              aria-label="Show QR code"
+              title="Show QR code"
+              className="rounded-lg border border-black/10 p-2 text-[#30372b] transition hover:border-[#a9c94f] hover:bg-white dark:border-white/10 dark:text-[#d5d8ce] dark:hover:bg-white/5"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="3" width="7" height="7" rx="1" />
+                <rect x="14" y="3" width="7" height="7" rx="1" />
+                <rect x="3" y="14" width="7" height="7" rx="1" />
+                <path d="M14 14h3v3h-3z" />
+                <path d="M20 20v.01" />
+              </svg>
+            </button>
             <ThemeToggle dark={dark} onToggle={() => setDark(!dark)} />
             <button
-              onClick={() => void copy(window.location.href, 'link')}
+              onClick={() => void shareRoom()}
               className="rounded-lg bg-[#d2f36b] px-3 py-2 font-semibold text-[#171a12] transition hover:bg-[#bddd55]"
             >
-              {copied === 'link' ? 'Copied' : 'Share'}
+              {copied === 'link' ? (
+                <span className="inline-flex items-center gap-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  Copied
+                </span>
+              ) : (
+                'Share room'
+              )}
             </button>
           </div>
         </header>
 
-        <section className="flex flex-1 flex-col py-8 sm:py-12">
-          <div className="mb-5 flex items-center justify-between gap-3">
+        <section className="flex min-h-0 flex-1 flex-col py-8 sm:py-12">
+          <div className="mb-4 flex items-center justify-between gap-3">
             {myName && (
               <p className="text-sm font-medium text-[#687064] dark:text-[#989c91]">
                 You are <span className="text-[#30372b] dark:text-[#d5d8ce]">{myName}</span>
               </p>
             )}
             <div className="flex items-center gap-3">
-            <p className="font-mono text-lg font-bold tracking-[0.18em] text-[#78951d] dark:text-[#d2f36b]">{activeRoom.roomCode}</p>
             <button
               onClick={() => void copy(activeRoom.roomCode, 'code')}
-              className="rounded-lg border border-black/10 px-3 py-2 text-xs font-medium text-[#30372b] transition hover:border-[#a9c94f] hover:bg-white dark:border-white/10 dark:text-[#d5d8ce] dark:hover:bg-white/5"
+              title="Copy room code"
+              className="font-mono text-lg font-bold tracking-[0.18em] text-[#78951d] transition hover:text-[#5c7a15] dark:text-[#d2f36b] dark:hover:text-[#e6fda0]"
             >
-              {copied === 'code' ? 'Copied' : 'Copy code'}
+              {activeRoom.roomCode}
+            </button>
+            <button
+              onClick={() => void copy(activeRoom.roomCode, 'code')}
+              className={
+                copied === 'code'
+                  ? 'rounded-lg border border-[#a9c94f] px-3 py-2 text-xs font-medium text-[#78951d] dark:text-[#d2f36b]'
+                  : 'rounded-lg border border-black/10 px-3 py-2 text-xs font-medium text-[#30372b] transition hover:border-[#a9c94f] hover:bg-white dark:border-white/10 dark:text-[#d5d8ce] dark:hover:bg-white/5'
+              }
+            >
+              {copied === 'code' ? (
+                <span className="inline-flex items-center gap-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  Copied
+                </span>
+              ) : (
+                'Copy room code'
+              )}
             </button>
             </div>
           </div>
-          <div className="flex flex-1 flex-col overflow-hidden rounded-[1.5rem] border border-black/10 bg-white shadow-xl shadow-black/5 dark:border-white/10 dark:bg-[#191b17] dark:shadow-black/20">
+          <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-black/10 bg-white shadow-xl shadow-black/5 dark:border-white/10 dark:bg-[#191b17] dark:shadow-black/20">
             <textarea
               ref={textareaRef}
               value={text}
               onChange={(event) => void updateText(event.target.value)}
               placeholder="Paste or type something here..."
-              className="min-h-[60svh] flex-1 resize-none bg-transparent p-6 text-lg leading-8 text-[#20251d] outline-none placeholder:text-[#9da49a] dark:text-[#f1f0eb] dark:placeholder:text-[#62675d] sm:p-8 sm:text-xl"
+              className="min-h-0 flex-1 resize-none bg-transparent p-6 text-base leading-7 text-[#20251d] outline-none placeholder:text-[#9da49a] dark:text-[#f1f0eb] dark:placeholder:text-[#62675d] sm:p-8"
               autoFocus
             />
             <div className="border-t border-black/10 px-6 py-4 text-xs text-[#7d8578] dark:border-white/10 dark:text-[#777d70]">
@@ -363,7 +454,18 @@ function App() {
             andreycruz16
           </a>
         </footer>
+        {copied && (
+          <div
+            role="status"
+            className="toast-in pointer-events-none fixed bottom-6 left-1/2 z-20 -translate-x-1/2 rounded-lg border border-black/10 bg-white px-4 py-2 text-xs font-medium text-[#30372b] shadow-xl dark:border-white/10 dark:bg-[#191b17] dark:text-[#d5d8ce]"
+          >
+            {copied === 'code' ? 'Room code copied to clipboard' : 'Room link copied to clipboard'}
+          </div>
+        )}
       </div>
+      {showQr && (
+        <QRCodeModal value={window.location.href} onClose={() => setShowQr(false)} />
+      )}
     </main>
   )
 }
