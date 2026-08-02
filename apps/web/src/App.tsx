@@ -32,7 +32,7 @@ function ThemeToggle({ dark, onToggle }: { dark: boolean; onToggle: () => void }
       onClick={onToggle}
       aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
       title={dark ? 'Switch to light mode' : 'Switch to dark mode'}
-      className="rounded-lg border border-black/10 p-2 text-[#30372b] transition hover:border-[#a9c94f] hover:bg-white dark:border-white/10 dark:text-[#d5d8ce] dark:hover:bg-white/5"
+      className="rounded-lg border border-black/10 p-2.5 text-[#30372b] transition hover:border-[#a9c94f] hover:bg-white sm:p-2 dark:border-white/10 dark:text-[#d5d8ce] dark:hover:bg-white/5"
     >
       {dark ? (
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -312,9 +312,9 @@ function App() {
   }
 
   return (
-    <main className="h-dvh overflow-hidden bg-[#f8f8f5] px-5 py-6 text-[#171a12] dark:bg-[#10110f] dark:text-[#e8e5df] sm:px-8 sm:py-8">
+    <main className="h-dvh overflow-hidden bg-[#f8f8f5] px-5 py-4 text-[#171a12] pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] dark:bg-[#10110f] dark:text-[#e8e5df] sm:px-8 sm:py-8">
       <div className="mx-auto flex h-full min-h-0 max-w-5xl flex-col">
-        <header className="flex items-center justify-between border-b border-black/10 pb-6 dark:border-white/10">
+        <header className="flex items-center justify-between border-b border-black/10 pb-4 pt-4 dark:border-white/10 sm:pb-6 sm:pt-6">
           <button
             type="button"
             onClick={() => window.location.assign('/')}
@@ -323,7 +323,7 @@ function App() {
           >
             paste<span className="text-[#78951d] dark:text-[#d2f36b]">paste</span>
           </button>
-          <div className="flex items-center gap-3 text-xs text-[#687064] dark:text-[#989c91]">
+          <div className="flex items-center gap-2 text-xs text-[#687064] dark:text-[#989c91] sm:gap-3">
             {status === 'Connected' ? (
               <span
                 className="breathe hidden h-2 w-2 rounded-full bg-[#5fbf47] sm:inline-block"
@@ -345,7 +345,7 @@ function App() {
               onClick={() => setShowQr(true)}
               aria-label="Show QR code"
               title="Show QR code"
-              className="rounded-lg border border-black/10 p-2 text-[#30372b] transition hover:border-[#a9c94f] hover:bg-white dark:border-white/10 dark:text-[#d5d8ce] dark:hover:bg-white/5"
+      className="rounded-lg border border-black/10 p-2.5 text-[#30372b] transition hover:border-[#a9c94f] hover:bg-white sm:p-2 dark:border-white/10 dark:text-[#d5d8ce] dark:hover:bg-white/5"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <rect x="3" y="3" width="7" height="7" rx="1" />
@@ -357,17 +357,23 @@ function App() {
             </button>
             <button
               onClick={() => void copy(window.location.href, 'link')}
-              className="rounded-lg bg-[#d2f36b] px-3 py-2 font-semibold text-[#171a12] transition hover:bg-[#bddd55]"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-[#d2f36b] px-2.5 py-2.5 font-semibold text-[#171a12] transition hover:bg-[#bddd55] sm:px-3"
             >
               {copied === 'link' ? (
-                <span className="inline-flex items-center gap-1">
+                <>
                   <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
-                  Copied
-                </span>
+                  <span className="hidden sm:inline">Copied</span>
+                </>
               ) : (
-                'Copy URL'
+                <>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+                  </svg>
+                  <span className="hidden sm:inline">Copy URL</span>
+                </>
               )}
             </button>
             <ThemeToggle dark={dark} onToggle={() => setDark(!dark)} />
@@ -392,11 +398,11 @@ function App() {
           </div>
         )}
 
-        <section className="flex min-h-0 flex-1 flex-col py-8 sm:py-12">
+        <section className="flex min-h-0 flex-1 flex-col py-4 sm:py-12">
           <div className="mb-4 flex items-center justify-between gap-3">
             <div className="flex flex-1 items-center">
               {myName && (
-                <p className="text-sm font-medium text-[#687064] dark:text-[#989c91]">
+                <p className="hidden text-sm font-medium text-[#687064] dark:text-[#989c91] sm:block">
                   You are <span className="font-bold text-[#78951d] dark:text-[#d2f36b]">{myName}</span>
                 </p>
               )}
@@ -418,14 +424,14 @@ function App() {
                 onClick={() => setShowJoin(true)}
                 aria-label="Join a room"
                 title="Join a room"
-                className="inline-flex items-center gap-1.5 rounded-lg border border-black/10 px-3 py-2 text-xs font-medium text-[#30372b] transition hover:border-[#a9c94f] hover:bg-white dark:border-white/10 dark:text-[#d5d8ce] dark:hover:bg-white/5"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-black/10 px-3 py-2.5 text-xs font-medium text-[#30372b] transition hover:border-[#a9c94f] hover:bg-white dark:border-white/10 dark:text-[#d5d8ce] dark:hover:bg-white/5"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
                   <polyline points="10 17 15 12 10 7" />
                   <line x1="15" y1="12" x2="3" y2="12" />
                 </svg>
-                Join a room
+                <span className="hidden sm:inline">Join a room</span>
               </button>
             </div>
           </div>
@@ -438,17 +444,17 @@ function App() {
               className="min-h-0 flex-1 resize-none bg-transparent p-6 text-base leading-7 text-[#20251d] outline-none placeholder:text-[#9da49a] dark:text-[#f1f0eb] dark:placeholder:text-[#62675d] sm:p-8"
               autoFocus
             />
-            <div className="flex items-center justify-between border-t border-black/10 px-6 py-4 text-xs text-[#7d8578] dark:border-white/10 dark:text-[#777d70]">
-              <span>Encrypted in your browser before it leaves this device.</span>
-              <div className="flex items-center gap-2">
+            <div className="flex flex-col gap-2 border-t border-black/10 px-6 py-4 text-xs text-[#7d8578] dark:border-white/10 dark:text-[#777d70] sm:flex-row sm:items-center sm:justify-between sm:gap-0">
+              <span className="text-[10px]">Encrypted in your browser before it leaves this device.</span>
+              <div className="flex w-full items-center gap-2 sm:w-auto sm:justify-end">
                 {text && (
                   <>
                     <button
                       onClick={() => void copy(text, 'text')}
                       className={
                         copied === 'text'
-                          ? 'rounded-lg border border-[#a9c94f] px-3 py-1.5 font-medium text-[#78951d] dark:text-[#d2f36b]'
-                          : 'rounded-lg border border-black/10 px-3 py-1.5 font-medium text-[#30372b] transition hover:border-[#a9c94f] hover:bg-white disabled:cursor-not-allowed disabled:opacity-40 dark:border-white/10 dark:text-[#d5d8ce] dark:hover:bg-white/5'
+                          ? 'inline-flex flex-1 items-center justify-center rounded-lg border border-[#a9c94f] px-3 py-2.5 font-medium text-[#78951d] dark:text-[#d2f36b] sm:flex-none'
+                          : 'inline-flex flex-1 items-center justify-center rounded-lg border border-black/10 px-3 py-2.5 font-medium text-[#30372b] transition hover:border-[#a9c94f] hover:bg-white disabled:cursor-not-allowed disabled:opacity-40 dark:border-white/10 dark:text-[#d5d8ce] dark:hover:bg-white/5 sm:flex-none'
                       }
                     >
                       {copied === 'text' ? (
@@ -468,8 +474,8 @@ function App() {
                       title={confirmingClear ? 'Confirm delete' : 'Clear'}
                       className={
                         confirmingClear
-                          ? 'rounded-lg border border-[#b34739] bg-[#b34739] px-3 py-1.5 font-medium text-white transition hover:bg-[#9d3d31]'
-                          : 'rounded-lg border border-black/10 px-3 py-1.5 font-medium text-[#30372b] transition hover:border-[#b34739] hover:bg-[#b34739] hover:text-white disabled:cursor-not-allowed disabled:opacity-40 dark:border-white/10 dark:text-[#d5d8ce] dark:hover:border-[#ff9d8c] dark:hover:bg-[#ff9d8c] dark:hover:text-[#171a12]'
+                          ? 'inline-flex flex-1 items-center justify-center rounded-lg border border-[#b34739] bg-[#b34739] px-3 py-2.5 font-medium text-white transition hover:bg-[#9d3d31] sm:flex-none'
+                          : 'inline-flex flex-1 items-center justify-center rounded-lg border border-black/10 px-3 py-2.5 font-medium text-[#30372b] transition hover:border-[#b34739] hover:bg-[#b34739] hover:text-white disabled:cursor-not-allowed disabled:opacity-40 dark:border-white/10 dark:text-[#d5d8ce] dark:hover:border-[#ff9d8c] dark:hover:bg-[#ff9d8c] dark:hover:text-[#171a12] sm:flex-none'
                       }
                     >
                       <span className="inline-flex items-center gap-1.5">
@@ -489,7 +495,7 @@ function App() {
           </div>
           {error && <p className="mt-4 text-sm text-[#b34739] dark:text-[#ff9d8c]">{error}</p>}
         </section>
-        <footer className="flex items-center justify-center border-t border-black/10 pt-5 text-xs text-[#7d8578] dark:border-white/10 dark:text-[#777d70]">
+        <footer className="flex items-center justify-center border-t border-black/10 pb-3 pt-3 text-xs text-[#7d8578] dark:border-white/10 dark:text-[#777d70] sm:pb-5 sm:pt-5">
           <span>Created by</span>
           <a
             href="https://github.com/andreycruz16"

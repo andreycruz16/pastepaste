@@ -30,7 +30,7 @@ export default function QRCodeModal({ value, onClose }: Props) {
     >
       <div className="w-full max-w-sm rounded-xl border border-black/10 bg-white p-6 shadow-xl dark:border-white/10 dark:bg-[#191b17]">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-[#30372b] dark:text-[#d5d8ce]">Join with your phone</h2>
+          <h2 className="text-sm font-semibold text-[#30372b] dark:text-[#d5d8ce]">Share room</h2>
           <button
             onClick={onClose}
             aria-label="Close"
