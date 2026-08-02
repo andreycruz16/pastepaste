@@ -8,7 +8,7 @@ Start the backend:
 
 ```bash
 cd apps/server
-dotnet run --urls http://localhost:5080
+dotnet run --urls http://localhost:8080
 ```
 
 Start the frontend in another terminal:
@@ -19,7 +19,7 @@ npm install
 npm run dev
 ```
 
-The frontend uses `http://localhost:5080` by default. Copy `.env.example` to `.env.local` if a different backend URL is needed.
+The frontend uses `http://localhost:8080` by default. Copy `.env.example` to `.env.local` if a different backend URL is needed.
 
 ## Architecture
 

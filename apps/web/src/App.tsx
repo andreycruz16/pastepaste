@@ -15,7 +15,7 @@ import {
 import QRCodeModal from './components/QRCodeModal'
 import JoinRoomModal from './components/JoinRoomModal'
 
-const apiUrl = import.meta.env.VITE_API_URL ?? 'http://localhost:5080'
+const apiUrl = import.meta.env.VITE_API_URL ?? 'http://localhost:8080'
 
 type RoomResponse = { roomCode: string; salt: string }
 

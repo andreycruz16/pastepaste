@@ -22,7 +22,7 @@ npm run lint     # oxlint
 ### Server (`apps/server`)
 
 ```bash
-dotnet run --urls http://localhost:5080
+dotnet run --urls http://localhost:8080
 dotnet build
 ```
 
@@ -30,7 +30,7 @@ dotnet build
 
 ## Configuration
 
-- `VITE_API_URL` in `apps/web/.env.local` — backend base URL (default `http://localhost:5080`). Copy `.env.example` to `.env.local` to override.
+- `VITE_API_URL` in `apps/web/.env.local` — backend base URL (default `http://localhost:8080`). Copy `.env.example` to `.env.local` to override.
 - `AllowedOrigins` in `apps/server/appsettings.json` — CORS origins (default `http://localhost:5173`).
 
 ## Architecture

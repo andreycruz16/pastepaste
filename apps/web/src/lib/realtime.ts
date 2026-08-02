@@ -6,7 +6,7 @@ import {
 } from '@microsoft/signalr'
 import type { EncryptedText } from './crypto'
 
-const apiUrl = import.meta.env.VITE_API_URL ?? 'http://localhost:5080'
+const apiUrl = import.meta.env.VITE_API_URL ?? 'http://localhost:8080'
 
 export function createConnection() {
   return new HubConnectionBuilder()
