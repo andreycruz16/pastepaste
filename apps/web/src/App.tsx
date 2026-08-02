@@ -58,7 +58,8 @@ function App() {
   const [status, setStatus] = useState('Opening...')
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
-  const [copied, setCopied] = useState<'code' | 'link' | null>(null)
+  const [copied, setCopied] = useState<'code' | 'link' | 'text' | null>(null)
+  const [confirmingClear, setConfirmingClear] = useState(false)
   const [unavailableCode, setUnavailableCode] = useState<string | null>(null)
   const [myName, setMyName] = useState<string | null>(null)
   const [participants, setParticipants] = useState<string[]>([])
@@ -73,6 +74,7 @@ function App() {
   const keyRef = useRef<CryptoKey | null>(null)
   const textareaRef = useRef<HTMLTextAreaElement | null>(null)
   const copiedTimerRef = useRef<number | null>(null)
+  const clearTimerRef = useRef<number | null>(null)
   const participantsRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
@@ -151,6 +153,7 @@ function App() {
   useEffect(() => {
     return () => {
       if (copiedTimerRef.current !== null) window.clearTimeout(copiedTimerRef.current)
+      if (clearTimerRef.current !== null) window.clearTimeout(clearTimerRef.current)
     }
   }, [])
 
@@ -249,7 +252,7 @@ function App() {
     }
   }
 
-  function showCopied(target: 'code' | 'link') {
+  function showCopied(target: 'code' | 'link' | 'text') {
     setCopied(target)
     if (copiedTimerRef.current !== null) window.clearTimeout(copiedTimerRef.current)
     copiedTimerRef.current = window.setTimeout(() => {
@@ -258,7 +261,22 @@ function App() {
     }, 2000)
   }
 
-  async function copy(value: string, target: 'code' | 'link') {
+  function handleClear() {
+    if (confirmingClear) {
+      setConfirmingClear(false)
+      if (clearTimerRef.current !== null) window.clearTimeout(clearTimerRef.current)
+      updateText('')
+      return
+    }
+
+    setConfirmingClear(true)
+    clearTimerRef.current = window.setTimeout(() => {
+      setConfirmingClear(false)
+      clearTimerRef.current = null
+    }, 3000)
+  }
+
+  async function copy(value: string, target: 'code' | 'link' | 'text') {
     const fallback = () => {
       const el = document.createElement('textarea')
       el.value = value
@@ -449,8 +467,53 @@ function App() {
               className="min-h-0 flex-1 resize-none bg-transparent p-6 text-base leading-7 text-[#20251d] outline-none placeholder:text-[#9da49a] dark:text-[#f1f0eb] dark:placeholder:text-[#62675d] sm:p-8"
               autoFocus
             />
-            <div className="border-t border-black/10 px-6 py-4 text-xs text-[#7d8578] dark:border-white/10 dark:text-[#777d70]">
-              Encrypted in your browser before it leaves this device.
+            <div className="flex items-center justify-between border-t border-black/10 px-6 py-4 text-xs text-[#7d8578] dark:border-white/10 dark:text-[#777d70]">
+              <span>Encrypted in your browser before it leaves this device.</span>
+              <div className="flex items-center gap-2">
+                {text && (
+                  <>
+                    <button
+                      onClick={() => void copy(text, 'text')}
+                      className={
+                        copied === 'text'
+                          ? 'rounded-lg border border-[#a9c94f] px-3 py-1.5 font-medium text-[#78951d] dark:text-[#d2f36b]'
+                          : 'rounded-lg border border-black/10 px-3 py-1.5 font-medium text-[#30372b] transition hover:border-[#a9c94f] hover:bg-white disabled:cursor-not-allowed disabled:opacity-40 dark:border-white/10 dark:text-[#d5d8ce] dark:hover:bg-white/5'
+                      }
+                    >
+                      {copied === 'text' ? (
+                        <span className="inline-flex items-center gap-1">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="20 6 9 17 4 12" />
+                          </svg>
+                          Copied
+                        </span>
+                      ) : (
+                        'Copy'
+                      )}
+                    </button>
+                    <button
+                      onClick={handleClear}
+                      aria-label={confirmingClear ? 'Confirm delete' : 'Clear'}
+                      title={confirmingClear ? 'Confirm delete' : 'Clear'}
+                      className={
+                        confirmingClear
+                          ? 'rounded-lg border border-[#b34739] bg-[#b34739] px-3 py-1.5 font-medium text-white transition hover:bg-[#9d3d31]'
+                          : 'rounded-lg border border-black/10 px-3 py-1.5 font-medium text-[#30372b] transition hover:border-[#b34739] hover:bg-[#b34739] hover:text-white disabled:cursor-not-allowed disabled:opacity-40 dark:border-white/10 dark:text-[#d5d8ce] dark:hover:border-[#ff9d8c] dark:hover:bg-[#ff9d8c] dark:hover:text-[#171a12]'
+                      }
+                    >
+                      <span className="inline-flex items-center gap-1.5">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="3 6 5 6 21 6" />
+                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                          <line x1="10" y1="11" x2="10" y2="17" />
+                          <line x1="14" y1="11" x2="14" y2="17" />
+                        </svg>
+                        {confirmingClear ? 'Confirm delete' : 'Clear'}
+                      </span>
+                    </button>
+                  </>
+                )}
+              </div>
             </div>
           </div>
           {error && <p className="mt-4 text-sm text-[#b34739] dark:text-[#ff9d8c]">{error}</p>}
@@ -471,7 +534,11 @@ function App() {
             role="status"
             className="toast-in pointer-events-none fixed bottom-6 left-1/2 z-20 -translate-x-1/2 rounded-lg border border-black/10 bg-white px-4 py-2 text-xs font-medium text-[#30372b] shadow-xl dark:border-white/10 dark:bg-[#191b17] dark:text-[#d5d8ce]"
           >
-            {copied === 'code' ? 'Room code copied to clipboard' : 'Room link copied to clipboard'}
+            {copied === 'code'
+              ? 'Room code copied to clipboard'
+              : copied === 'link'
+                ? 'Room link copied to clipboard'
+                : 'Text copied to clipboard'}
           </div>
         )}
       </div>
