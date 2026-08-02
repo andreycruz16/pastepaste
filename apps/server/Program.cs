@@ -1,5 +1,5 @@
-using Pasteroom.Server.Hubs;
-using Pasteroom.Server.Services;
+using Pastepaste.Server.Hubs;
+using Pastepaste.Server.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 

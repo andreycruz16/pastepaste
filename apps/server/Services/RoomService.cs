@@ -1,8 +1,8 @@
 using System.Collections.Concurrent;
 using System.Security.Cryptography;
-using Pasteroom.Server.Models;
+using Pastepaste.Server.Models;
 
-namespace Pasteroom.Server.Services;
+namespace Pastepaste.Server.Services;
 
 public sealed class RoomService
 {

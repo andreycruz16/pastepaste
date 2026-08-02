@@ -1,4 +1,4 @@
-# Pasteroom
+# Pastepaste
 
 Temporary, end-to-end encrypted text sharing between devices in the same room.
 

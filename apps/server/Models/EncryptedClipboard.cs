@@ -1,3 +1,3 @@
-namespace Pasteroom.Server.Models;
+namespace Pastepaste.Server.Models;
 
 public sealed record EncryptedClipboard(string Ciphertext, string Iv);

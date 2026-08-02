@@ -4,7 +4,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <RootNamespace>Pasteroom.Server</RootNamespace>
+    <RootNamespace>Pastepaste.Server</RootNamespace>
   </PropertyGroup>
 
 </Project>

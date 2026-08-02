@@ -1,4 +1,4 @@
-namespace Pasteroom.Server.Models;
+namespace Pastepaste.Server.Models;
 
 public sealed class RoomState
 {

@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.SignalR;
-using Pasteroom.Server.Models;
-using Pasteroom.Server.Services;
+using Pastepaste.Server.Models;
+using Pastepaste.Server.Services;
 
-namespace Pasteroom.Server.Hubs;
+namespace Pastepaste.Server.Hubs;
 
 public sealed class ClipboardHub(RoomService rooms) : Hub
 {
