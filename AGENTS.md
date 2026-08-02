@@ -35,7 +35,7 @@ dotnet build
 
 ## Architecture
 
-- Room codes are exactly 5 characters, uppercase `A-Z0-9`.
+- Room codes are exactly 5 characters, uppercase CVCVC (consonant-vowel-consonant-vowel-consonant, e.g. `KURAT`). Consonants: `BCDFGHJKLMNPRSTVWXYZ`, vowels: `AEIOU`.
 - Rooms are held in memory by `RoomService` (`ConcurrentDictionary`); they disappear when the last connection leaves or the server restarts.
 - Clipboard text is encrypted with AES-GCM in the browser; the server only stores and relays the encrypted payload.
 - SignalR hub at `/hubs/clipboard` with methods `JoinRoom`, `UpdateClipboard`, `LeaveRoom`.

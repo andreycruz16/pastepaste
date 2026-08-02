@@ -3,11 +3,10 @@ import { QRCodeCanvas } from 'qrcode.react'
 
 type Props = {
   value: string
-  onCopyLink: () => void
   onClose: () => void
 }
 
-export default function QRCodeModal({ value, onCopyLink, onClose }: Props) {
+export default function QRCodeModal({ value, onClose }: Props) {
   const overlayRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
@@ -49,14 +48,6 @@ export default function QRCodeModal({ value, onCopyLink, onClose }: Props) {
         <p className="mt-4 text-center font-mono text-sm font-semibold break-all text-[#78951d] dark:text-[#d2f36b]">
           {value}
         </p>
-        <div className="mt-3 flex justify-center">
-          <button
-            onClick={onCopyLink}
-            className="rounded-lg bg-[#d2f36b] px-3 py-1.5 text-xs font-semibold text-[#171a12] transition hover:bg-[#bddd55]"
-          >
-            Copy link
-          </button>
-        </div>
         <p className="mt-2 text-center text-xs text-[#7d8578] dark:text-[#777d70]">
           Scan the code with your phone's camera to join this room.
         </p>

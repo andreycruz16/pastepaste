@@ -6,7 +6,8 @@ namespace Pastepaste.Server.Services;
 
 public sealed class RoomService
 {
-    private const string Alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    private const string Consonants = "BCDFGHJKLMNPRSTVWXYZ";
+    private const string Vowels = "AEIOU";
     private static readonly string[] Adjectives =
     [
         "Pretty", "Strong", "Lively", "Gentle", "Brave", "Silly",
@@ -21,12 +22,26 @@ public sealed class RoomService
     private readonly ConcurrentDictionary<string, string> _connectionRooms = new();
     private readonly ConcurrentDictionary<string, string> _connectionNames = new();
 
+    private static bool IsValidCode(string code)
+    {
+        if (code.Length != 5) return false;
+        return Consonants.Contains(code[0])
+            && Vowels.Contains(code[1])
+            && Consonants.Contains(code[2])
+            && Vowels.Contains(code[3])
+            && Consonants.Contains(code[4]);
+    }
+
     public RoomResponse CreateRoom()
     {
         while (true)
         {
-            var code = string.Concat(Enumerable.Range(0, 5)
-                .Select(_ => Alphabet[RandomNumberGenerator.GetInt32(Alphabet.Length)]));
+            var code = string.Concat(
+                Consonants[RandomNumberGenerator.GetInt32(Consonants.Length)],
+                Vowels[RandomNumberGenerator.GetInt32(Vowels.Length)],
+                Consonants[RandomNumberGenerator.GetInt32(Consonants.Length)],
+                Vowels[RandomNumberGenerator.GetInt32(Vowels.Length)],
+                Consonants[RandomNumberGenerator.GetInt32(Consonants.Length)]);
 
             var response = CreateRoom(code);
             if (response is not null) return response;
@@ -36,7 +51,7 @@ public sealed class RoomService
     public RoomResponse? CreateRoom(string roomCode)
     {
         var code = roomCode.Trim().ToUpperInvariant();
-        if (code.Length != 5 || !code.All(character => Alphabet.Contains(character))) return null;
+        if (!IsValidCode(code)) return null;
 
         var room = new RoomState
         {
@@ -50,16 +65,14 @@ public sealed class RoomService
     public RoomResponse? GetOrCreateRoom(string roomCode)
     {
         var code = roomCode.Trim().ToUpperInvariant();
-        if (code.Length != 5 || !code.All(character => Alphabet.Contains(character))) return null;
+        if (!IsValidCode(code)) return null;
 
         if (_rooms.TryGetValue(code, out var existingRoom)) return existingRoom.ToResponse();
         return CreateRoom(code) ?? _rooms.GetValueOrDefault(code)?.ToResponse();
     }
 
     public RoomState? GetRoom(string roomCode) =>
-        roomCode.Length == 5 && roomCode.All(character => Alphabet.Contains(character))
-            ? _rooms.GetValueOrDefault(roomCode)
-            : null;
+        IsValidCode(roomCode) ? _rooms.GetValueOrDefault(roomCode) : null;
 
     public void AddConnection(RoomState room, string connectionId)
     {

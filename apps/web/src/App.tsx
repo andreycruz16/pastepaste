@@ -13,13 +13,16 @@ import {
   sendClipboard,
 } from './lib/realtime'
 import QRCodeModal from './components/QRCodeModal'
+import JoinRoomModal from './components/JoinRoomModal'
 
 const apiUrl = import.meta.env.VITE_API_URL ?? 'http://localhost:5080'
 
 type RoomResponse = { roomCode: string; salt: string }
 
 function roomCodeFromPath() {
-  const match = window.location.pathname.match(/^\/([A-Za-z0-9]{5})\/?$/)
+  const match = window.location.pathname.match(
+    /^\/([BCDFGHJKLMNPRSTVWXYZ][AEIOU][BCDFGHJKLMNPRSTVWXYZ][AEIOU][BCDFGHJKLMNPRSTVWXYZ])\/?$/,
+  )
   return match?.[1].toUpperCase() ?? null
 }
 
@@ -64,9 +67,10 @@ function App() {
   const [participants, setParticipants] = useState<string[]>([])
   const [showParticipants, setShowParticipants] = useState(false)
   const [showQr, setShowQr] = useState(false)
+  const [showJoin, setShowJoin] = useState(false)
   const [dark, setDark] = useState(() => {
     const stored = localStorage.getItem('theme')
-    return stored ? stored === 'dark' : true
+    return stored ? stored === 'dark' : false
   })
   const activeRoomRef = useRef<RoomResponse | null>(null)
   const connectionRef = useRef<HubConnection | null>(null)
@@ -158,7 +162,21 @@ function App() {
     }
   }
 
+  async function handleJoinRoom(code: string) {
+    const roomResponse = await fetch(`${apiUrl}/api/rooms/${code}/claim`, {
+      method: 'POST',
+    })
+    if (!roomResponse.ok) throw new Error('Could not join that room')
+    setShowJoin(false)
+    await enterRoom((await roomResponse.json()) as RoomResponse)
+  }
+
   async function enterRoom(response: RoomResponse) {
+    if (connectionRef.current && activeRoomRef.current) {
+      await disconnectFromRoom(connectionRef.current, activeRoomRef.current.roomCode)
+      connectionRef.current = null
+    }
+
     setStatus('Opening secure...')
     setMyName(null)
     setParticipants([])
@@ -297,9 +315,14 @@ function App() {
     <main className="h-dvh overflow-hidden bg-[#f8f8f5] px-5 py-6 text-[#171a12] dark:bg-[#10110f] dark:text-[#e8e5df] sm:px-8 sm:py-8">
       <div className="mx-auto flex h-full min-h-0 max-w-5xl flex-col">
         <header className="flex items-center justify-between border-b border-black/10 pb-6 dark:border-white/10">
-          <div className="text-2xl font-bold tracking-[-0.055em] text-[#171a12] dark:text-[#e8e5df]">
+          <button
+            type="button"
+            onClick={() => window.location.assign('/')}
+            title="Generate new code"
+            className="cursor-pointer text-2xl font-bold tracking-[-0.055em] text-[#171a12] transition hover:opacity-70 dark:text-[#e8e5df]"
+          >
             paste<span className="text-[#78951d] dark:text-[#d2f36b]">paste</span>
-          </div>
+          </button>
           <div className="flex items-center gap-3 text-xs text-[#687064] dark:text-[#989c91]">
             {status === 'Connected' ? (
               <span
@@ -332,6 +355,21 @@ function App() {
                 <path d="M20 20v.01" />
               </svg>
             </button>
+            <button
+              onClick={() => void copy(window.location.href, 'link')}
+              className="rounded-lg bg-[#d2f36b] px-3 py-2 font-semibold text-[#171a12] transition hover:bg-[#bddd55]"
+            >
+              {copied === 'link' ? (
+                <span className="inline-flex items-center gap-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  Copied
+                </span>
+              ) : (
+                'Copy URL'
+              )}
+            </button>
             <ThemeToggle dark={dark} onToggle={() => setDark(!dark)} />
           </div>
         </header>
@@ -356,20 +394,40 @@ function App() {
 
         <section className="flex min-h-0 flex-1 flex-col py-8 sm:py-12">
           <div className="mb-4 flex items-center justify-between gap-3">
-            {myName && (
-              <p className="text-sm font-medium text-[#687064] dark:text-[#989c91]">
-                You are <span className="font-bold text-[#78951d] dark:text-[#d2f36b]">{myName}</span>
-              </p>
-            )}
-            <div className="flex items-center gap-3">
-            <button
-              onClick={() => void copy(activeRoom.roomCode, 'code')}
-              title="Copy room code"
-              className="font-mono text-lg font-bold tracking-[0.18em] text-[#78951d] transition hover:text-[#5c7a15] dark:text-[#d2f36b] dark:hover:text-[#e6fda0]"
-            >
-              {activeRoom.roomCode}
-            </button>
-          </div>
+            <div className="flex flex-1 items-center">
+              {myName && (
+                <p className="text-sm font-medium text-[#687064] dark:text-[#989c91]">
+                  You are <span className="font-bold text-[#78951d] dark:text-[#d2f36b]">{myName}</span>
+                </p>
+              )}
+            </div>
+            <div className="flex flex-col items-center gap-1">
+              <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[#7d8578] dark:text-[#777d70]">
+                Room code
+              </span>
+              <button
+                onClick={() => void copy(activeRoom.roomCode, 'code')}
+                title="Copy room code"
+                className="font-mono text-lg font-bold tracking-[0.18em] text-[#78951d] transition hover:text-[#5c7a15] dark:text-[#d2f36b] dark:hover:text-[#e6fda0]"
+              >
+                {activeRoom.roomCode}
+              </button>
+            </div>
+            <div className="flex flex-1 items-center justify-end">
+              <button
+                onClick={() => setShowJoin(true)}
+                aria-label="Join a room"
+                title="Join a room"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-black/10 px-3 py-2 text-xs font-medium text-[#30372b] transition hover:border-[#a9c94f] hover:bg-white dark:border-white/10 dark:text-[#d5d8ce] dark:hover:bg-white/5"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+                  <polyline points="10 17 15 12 10 7" />
+                  <line x1="15" y1="12" x2="3" y2="12" />
+                </svg>
+                Join a room
+              </button>
+            </div>
           </div>
           <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-black/10 bg-white shadow-xl shadow-black/5 dark:border-white/10 dark:bg-[#191b17] dark:shadow-black/20">
             <textarea
@@ -456,11 +514,10 @@ function App() {
         )}
       </div>
       {showQr && (
-        <QRCodeModal
-          value={window.location.href}
-          onCopyLink={() => void copy(window.location.href, 'link')}
-          onClose={() => setShowQr(false)}
-        />
+        <QRCodeModal value={window.location.href} onClose={() => setShowQr(false)} />
+      )}
+      {showJoin && (
+        <JoinRoomModal onJoin={handleJoinRoom} onClose={() => setShowJoin(false)} />
       )}
     </main>
   )
