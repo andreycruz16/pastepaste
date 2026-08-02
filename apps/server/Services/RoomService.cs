@@ -7,8 +7,19 @@ namespace Pastepaste.Server.Services;
 public sealed class RoomService
 {
     private const string Alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    private static readonly string[] Adjectives =
+    [
+        "Pretty", "Strong", "Lively", "Gentle", "Brave", "Silly",
+        "Calm", "Swift", "Clever", "Mighty", "Sunny", "Witty",
+    ];
+    private static readonly string[] Nouns =
+    [
+        "Cat", "Melon", "Banana", "Otter", "Fox", "Panda",
+        "Tiger", "Dolphin", "Cactus", "Kiwi", "Llama", "Giraffe",
+    ];
     private readonly ConcurrentDictionary<string, RoomState> _rooms = new();
     private readonly ConcurrentDictionary<string, string> _connectionRooms = new();
+    private readonly ConcurrentDictionary<string, string> _connectionNames = new();
 
     public RoomResponse CreateRoom()
     {
@@ -63,6 +74,32 @@ public sealed class RoomService
 
     public void UpdateClipboard(RoomState room, EncryptedClipboard clipboard) => room.UpdateClipboard(clipboard);
 
+    public string AssignName(RoomState room, string connectionId, string? preferredName)
+    {
+        if (!string.IsNullOrWhiteSpace(preferredName) && room.TryReserveName(preferredName))
+        {
+            _connectionNames[connectionId] = preferredName;
+            return preferredName;
+        }
+
+        while (true)
+        {
+            var name = $"{Adjectives[RandomNumberGenerator.GetInt32(Adjectives.Length)]} " +
+                $"{Nouns[RandomNumberGenerator.GetInt32(Nouns.Length)]}";
+
+            if (room.TryReserveName(name))
+            {
+                _connectionNames[connectionId] = name;
+                return name;
+            }
+        }
+    }
+
+    public IReadOnlyList<string> GetRoomNames(RoomState room) => room.GetNames();
+
+    public string? GetRoomCodeForConnection(string connectionId) =>
+        _connectionRooms.GetValueOrDefault(connectionId);
+
     public void RemoveConnection(string connectionId)
     {
         if (_connectionRooms.TryRemove(connectionId, out var roomCode)) RemoveConnection(roomCode, connectionId);
@@ -70,9 +107,10 @@ public sealed class RoomService
 
     public void RemoveConnection(string roomCode, string connectionId)
     {
-        if (_rooms.TryGetValue(roomCode, out var room) && room.RemoveConnection(connectionId))
+        if (_rooms.TryGetValue(roomCode, out var room))
         {
-            _rooms.TryRemove(roomCode, out _);
+            if (_connectionNames.TryRemove(connectionId, out var name)) room.ReleaseName(name);
+            if (room.RemoveConnection(connectionId)) _rooms.TryRemove(roomCode, out _);
         }
 
         _connectionRooms.TryRemove(connectionId, out _);

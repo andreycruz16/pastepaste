@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   font-family: Inter, ui-sans-serif, system-ui, sans-serif;
   color: #171a12;
@@ -7,6 +9,11 @@
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
+}
+
+.dark {
+  color: #e8e5df;
+  background: #10110f;
 }
 
 #root {

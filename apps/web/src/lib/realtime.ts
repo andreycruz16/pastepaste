@@ -16,12 +16,16 @@ export function createConnection() {
     .build()
 }
 
-export async function connectToRoom(connection: HubConnection, roomCode: string) {
+export async function connectToRoom(
+  connection: HubConnection,
+  roomCode: string,
+  preferredName: string,
+) {
   if (connection.state === HubConnectionState.Disconnected) {
     await connection.start()
   }
 
-  await connection.invoke('JoinRoom', roomCode)
+  await connection.invoke('JoinRoom', roomCode, preferredName)
 }
 
 export async function sendClipboard(

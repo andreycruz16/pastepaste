@@ -3,6 +3,7 @@ namespace Pastepaste.Server.Models;
 public sealed class RoomState
 {
     private readonly HashSet<string> _connections = [];
+    private readonly HashSet<string> _names = [];
 
     public required string RoomCode { get; init; }
     public required string Salt { get; init; }
@@ -25,4 +26,19 @@ public sealed class RoomState
     }
 
     public void UpdateClipboard(EncryptedClipboard clipboard) => LatestClipboard = clipboard;
+
+    public bool TryReserveName(string name)
+    {
+        lock (_names) return _names.Add(name);
+    }
+
+    public void ReleaseName(string name)
+    {
+        lock (_names) _names.Remove(name);
+    }
+
+    public IReadOnlyList<string> GetNames()
+    {
+        lock (_names) return [.. _names];
+    }
 }
