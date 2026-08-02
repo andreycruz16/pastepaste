@@ -256,33 +256,17 @@ function App() {
     }, 3000)
   }
 
-  async function copy(value: string, target: 'code' | 'link' | 'text') {
-    const fallback = () => {
-      const el = document.createElement('textarea')
-      el.value = value
-      el.style.position = 'fixed'
-      el.style.opacity = '0'
-      document.body.appendChild(el)
-      el.select()
-      const ok = document.execCommand('copy')
-      document.body.removeChild(el)
-      return ok
-    }
-
-    try {
-      if (!navigator.clipboard?.writeText) {
-        if (!fallback()) throw new Error('Copy failed')
-      } else {
-        try {
-          await navigator.clipboard.writeText(value)
-        } catch {
-          if (!fallback()) throw new Error('Copy failed')
-        }
-      }
-      showCopied(target)
-    } catch {
-      setError('Could not copy. Please copy it manually instead.')
-    }
+  function copy(value: string, target: 'code' | 'link' | 'text') {
+    const el = document.createElement('textarea')
+    el.value = value
+    el.style.position = 'fixed'
+    el.style.opacity = '0'
+    document.body.appendChild(el)
+    el.select()
+    const ok = document.execCommand('copy')
+    document.body.removeChild(el)
+    if (ok) showCopied(target)
+    else setError('Could not copy. Please copy it manually instead.')
   }
 
   if (!activeRoom) {
