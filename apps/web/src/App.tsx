@@ -321,7 +321,13 @@ function App() {
         </header>
 
         <section className="flex flex-1 flex-col py-8 sm:py-12">
-          <div className="mb-5 flex items-center justify-end gap-3">
+          <div className="mb-5 flex items-center justify-between gap-3">
+            {myName && (
+              <p className="text-sm font-medium text-[#687064] dark:text-[#989c91]">
+                You are <span className="text-[#30372b] dark:text-[#d5d8ce]">{myName}</span>
+              </p>
+            )}
+            <div className="flex items-center gap-3">
             <p className="font-mono text-lg font-bold tracking-[0.18em] text-[#78951d] dark:text-[#d2f36b]">{activeRoom.roomCode}</p>
             <button
               onClick={() => void copy(activeRoom.roomCode, 'code')}
@@ -329,6 +335,7 @@ function App() {
             >
               {copied === 'code' ? 'Copied' : 'Copy code'}
             </button>
+            </div>
           </div>
           <div className="flex flex-1 flex-col overflow-hidden rounded-[1.5rem] border border-black/10 bg-white shadow-xl shadow-black/5 dark:border-white/10 dark:bg-[#191b17] dark:shadow-black/20">
             <textarea
