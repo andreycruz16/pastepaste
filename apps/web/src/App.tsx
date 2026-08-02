@@ -131,6 +131,10 @@ function App() {
   }, [dark])
 
   useEffect(() => {
+    document.title = activeRoom ? `Pastepaste · ${activeRoom.roomCode}` : 'Pastepaste'
+  }, [activeRoom])
+
+  useEffect(() => {
     return () => {
       if (copiedTimerRef.current !== null) window.clearTimeout(copiedTimerRef.current)
       if (clearTimerRef.current !== null) window.clearTimeout(clearTimerRef.current)
