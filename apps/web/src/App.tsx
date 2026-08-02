@@ -268,19 +268,6 @@ function App() {
     }
   }
 
-  async function shareRoom() {
-    const url = window.location.href
-    if (navigator.share) {
-      try {
-        await navigator.share({ title: 'Pastepaste', text: 'Join my Pastepaste room', url })
-        return
-      } catch {
-        // user dismissed the share sheet or sharing failed; fall back to copy
-      }
-    }
-    await copy(url, 'link')
-  }
-
   if (!activeRoom) {
     return (
       <main className="relative flex min-h-screen items-center justify-center bg-[#f8f8f5] px-5 text-[#171a12] dark:bg-[#10110f] dark:text-[#e8e5df]">
@@ -363,19 +350,19 @@ function App() {
               onClick={() => setShowQr(true)}
               aria-label="Show QR code"
               title="Show QR code"
-              className="rounded-lg border border-black/10 p-2 text-[#30372b] transition hover:border-[#a9c94f] hover:bg-white dark:border-white/10 dark:text-[#d5d8ce] dark:hover:bg-white/5"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-black/10 px-2.5 py-2 text-xs font-medium text-[#30372b] transition hover:border-[#a9c94f] hover:bg-white dark:border-white/10 dark:text-[#d5d8ce] dark:hover:bg-white/5"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <rect x="3" y="3" width="7" height="7" rx="1" />
                 <rect x="14" y="3" width="7" height="7" rx="1" />
                 <rect x="3" y="14" width="7" height="7" rx="1" />
                 <path d="M14 14h3v3h-3z" />
                 <path d="M20 20v.01" />
               </svg>
+              QR code
             </button>
-            <ThemeToggle dark={dark} onToggle={() => setDark(!dark)} />
             <button
-              onClick={() => void shareRoom()}
+              onClick={() => void copy(window.location.href, 'link')}
               className="rounded-lg bg-[#d2f36b] px-3 py-2 font-semibold text-[#171a12] transition hover:bg-[#bddd55]"
             >
               {copied === 'link' ? (
@@ -386,9 +373,10 @@ function App() {
                   Copied
                 </span>
               ) : (
-                'Share room'
+                'Copy URL'
               )}
             </button>
+            <ThemeToggle dark={dark} onToggle={() => setDark(!dark)} />
           </div>
         </header>
 
@@ -451,7 +439,7 @@ function App() {
             rel="noreferrer"
             className="ml-1 font-medium text-[#30372b] underline-offset-2 transition hover:underline dark:text-[#d5d8ce]"
           >
-            andreycruz16
+            Mark Andrey
           </a>
         </footer>
         {copied && (
