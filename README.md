@@ -2,16 +2,16 @@
 
 Temporary, end-to-end encrypted text sharing between devices in the same room.
 
-## Local development
+![Editor screenshot](screenshots/editor.png)
 
-Start the backend:
+## Monorepo layout
 
-```bash
-cd apps/server
-dotnet run --urls http://localhost:8080
-```
+- `apps/web` — React, TypeScript, Vite, and Tailwind CSS frontend
+- `apps/server` — ASP.NET Core minimal API and SignalR backend
 
-Start the frontend in another terminal:
+## Web (`apps/web`)
+
+### Local development
 
 ```bash
 cd apps/web
@@ -21,7 +21,25 @@ npm run dev
 
 The frontend uses `http://localhost:8080` by default. Copy `.env.example` to `.env.local` if a different backend URL is needed.
 
-## Docker
+### Commands
+
+```bash
+npm run build    # tsc -b && vite build
+npm run lint     # oxlint
+```
+
+## Server (`apps/server`)
+
+### Local development
+
+```bash
+cd apps/server
+dotnet run --urls http://localhost:8080
+```
+
+`dotnet run` does not hot-reload. Restart the server process (or use `dotnet watch run`) after backend changes.
+
+### Docker
 
 Build and push the API image to Docker Hub:
 
@@ -47,10 +65,12 @@ docker buildx build \
 
 ## Architecture
 
-- React, TypeScript, Vite, and Tailwind CSS frontend
-- ASP.NET Core Minimal API and SignalR backend
 - AES-GCM encryption in the browser
 - In-memory room state; no clipboard text is persisted
 - Docker deployment target for Azure Container Apps
 
 Rooms disappear when the last connected device leaves or the backend restarts. Five-character room codes are convenient for the alpha but are not strong encryption secrets.
+
+## License
+
+[MIT](LICENSE)
