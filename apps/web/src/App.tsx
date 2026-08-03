@@ -526,7 +526,11 @@ function App() {
         <QRCodeModal value={window.location.href} onClose={() => setShowQr(false)} />
       )}
       {showJoin && (
-        <JoinRoomModal onJoin={handleJoinRoom} onClose={() => setShowJoin(false)} />
+        <JoinRoomModal
+          currentRoomCode={activeRoom.roomCode}
+          onJoin={handleJoinRoom}
+          onClose={() => setShowJoin(false)}
+        />
       )}
     </main>
   )

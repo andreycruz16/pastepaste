@@ -4,11 +4,12 @@ const ROOM_CODE_PATTERN =
   /^[BCDFGHJKLMNPRSTVWXYZ][AEIOU][BCDFGHJKLMNPRSTVWXYZ][AEIOU][BCDFGHJKLMNPRSTVWXYZ]$/
 
 type Props = {
+  currentRoomCode: string
   onJoin: (code: string) => Promise<void>
   onClose: () => void
 }
 
-export default function JoinRoomModal({ onJoin, onClose }: Props) {
+export default function JoinRoomModal({ currentRoomCode, onJoin, onClose }: Props) {
   const overlayRef = useRef<HTMLDivElement | null>(null)
   const inputRef = useRef<HTMLInputElement | null>(null)
   const [code, setCode] = useState('')
@@ -32,6 +33,11 @@ export default function JoinRoomModal({ onJoin, onClose }: Props) {
 
   async function submit() {
     if (!valid || busy) return
+
+    if (normalized === currentRoomCode) {
+      setError('That is your current room code.')
+      return
+    }
 
     setBusy(true)
     setError('')
@@ -77,28 +83,36 @@ export default function JoinRoomModal({ onJoin, onClose }: Props) {
           <input
             ref={inputRef}
             value={code}
-            onChange={(event) =>
-              setCode(event.target.value.replace(/[^A-Za-z]/g, '').toUpperCase().slice(0, 5))
-            }
+            onChange={(event) => {
+              const next = event.target.value.replace(/[^A-Za-z]/g, '').toUpperCase().slice(0, 5)
+              if (next === currentRoomCode) {
+                setError('That is your current room code.')
+              } else {
+                setError('')
+              }
+              setCode(next)
+            }}
             placeholder="TIGER"
             autoCapitalize="characters"
             autoComplete="off"
             spellCheck={false}
             className="w-full rounded-xl border border-black/10 bg-[#f8f8f5] p-4 text-center font-mono text-2xl font-bold tracking-[0.2em] text-[#171a12] outline-none placeholder:text-[#9da49a] focus:border-[#a9c94f] dark:border-white/10 dark:bg-[#10110f] dark:text-[#e8e5df] dark:placeholder:text-[#62675d]"
           />
-          {code.length > 0 && !valid && (
+          {!error && code.length > 0 && !valid && (
             <p className="mt-2 text-xs text-[#b34739] dark:text-[#ff9d8c]">
               Room codes are 5 letters, like TIGER.
             </p>
           )}
           {error && <p className="mt-2 text-xs text-[#b34739] dark:text-[#ff9d8c]">{error}</p>}
-          <button
-            type="submit"
-            disabled={!valid || busy}
-            className="mt-4 w-full rounded-lg bg-[#d2f36b] px-4 py-2.5 text-sm font-semibold text-[#171a12] transition hover:bg-[#bddd55] disabled:cursor-not-allowed disabled:opacity-40"
-          >
-            {busy ? 'Joining...' : 'Join room'}
-          </button>
+          {valid && error !== 'That is your current room code.' && (
+            <button
+              type="submit"
+              disabled={busy}
+              className="mt-4 w-full rounded-lg bg-[#d2f36b] px-4 py-2.5 text-sm font-semibold text-[#171a12] transition hover:bg-[#bddd55] disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              {busy ? 'Joining...' : 'Join room'}
+            </button>
+          )}
         </form>
         <p className="mt-4 text-center text-xs text-[#7d8578] dark:text-[#777d70]">
           Ask the other person for their room code and type it here.
