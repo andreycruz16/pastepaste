@@ -14,6 +14,8 @@ jobs:
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
     runs-on: ubuntu-latest
     name: Build and Deploy Job
+    env:
+      VITE_API_URL: https://pastepaste-api.orangeocean-744e4fb1.southeastasia.azurecontainerapps.io
     permissions:
        id-token: write
        contents: read
