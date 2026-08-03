@@ -33,9 +33,11 @@ docker buildx build \
   --push .
 ```
 
-And to GitHub Container Registry:
+And to GitHub Container Registry (use your GitHub PAT as the password):
 
 ```bash
+docker login ghcr.io -u andreycruz16
+
 docker buildx build \
   --platform linux/amd64,linux/arm64 \
   -t ghcr.io/andreycruz16/pastepaste-api:latest \
