@@ -16,6 +16,7 @@ import QRCodeModal from './components/QRCodeModal'
 import JoinRoomModal from './components/JoinRoomModal'
 
 const apiUrl = import.meta.env.VITE_API_URL ?? 'http://localhost:8080'
+const feedbackUrl = `mailto:andreycruz16@proton.me?subject=${encodeURIComponent('Pastepaste feedback')}`
 
 type RoomResponse = { roomCode: string; salt: string }
 
@@ -487,6 +488,13 @@ function App() {
             className="ml-1 font-medium text-[#30372b] underline-offset-2 transition hover:underline dark:text-[#d5d8ce]"
           >
             Mark Andrey
+          </a>
+          <span className="mx-2">·</span>
+          <a
+            href={feedbackUrl}
+            className="font-medium text-[#30372b] underline-offset-2 transition hover:underline dark:text-[#d5d8ce]"
+          >
+            Feedback
           </a>
         </footer>
         {copied && (
