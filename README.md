@@ -63,6 +63,12 @@ docker buildx build \
   --push .
 ```
 
+## Static websites
+
+- Vercel: https://pastepaste.vercel.app
+- Cloudflare Workers: https://pastepaste.madc.workers.dev
+- Azure Static Web Apps: https://calm-pebble-08bf65c00.7.azurestaticapps.net
+
 ## Architecture
 
 - AES-GCM encryption in the browser
