@@ -108,7 +108,7 @@ function App() {
         if (!cancelled) await enterRoom(response)
       } catch {
         if (!cancelled) {
-          setError('Could not create a new link. Please try again.')
+          setError('Could not create a new link. Please try again. Contact support@markandrey.com for help.')
           setStatus('Unable to connect')
         }
       } finally {
@@ -155,7 +155,7 @@ function App() {
       if (!roomResponse.ok) throw new Error('Creation failed')
       await enterRoom((await roomResponse.json()) as RoomResponse)
     } catch {
-      setError('Could not create a new link. Please try again.')
+      setError('Could not create a new link. Please try again. Contact support@markandrey.com for help.')
       setStatus('Unable to connect')
     } finally {
       setBusy(false)
