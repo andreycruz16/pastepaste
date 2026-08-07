@@ -16,7 +16,7 @@ import QRCodeModal from './components/QRCodeModal'
 import JoinRoomModal from './components/JoinRoomModal'
 
 const apiUrl = import.meta.env.VITE_API_URL ?? 'http://localhost:8080'
-const feedbackUrl = `mailto:andreycruz16@proton.me?subject=${encodeURIComponent('Pastepaste feedback')}`
+const feedbackUrl = `mailto:contact@markandrey.com?subject=${encodeURIComponent('Pastepaste feedback')}`
 
 type RoomResponse = { roomCode: string; salt: string }
 
@@ -482,7 +482,7 @@ function App() {
         <footer className="flex items-center justify-center border-t border-black/10 pb-3 pt-3 text-xs text-[#7d8578] dark:border-white/10 dark:text-[#777d70] sm:pb-5 sm:pt-5">
           <span>Created by</span>
           <a
-            href="https://github.com/andreycruz16"
+            href="https://github.com/markandreydc"
             target="_blank"
             rel="noreferrer"
             className="ml-1 font-medium text-[#30372b] underline-offset-2 transition hover:underline dark:text-[#d5d8ce]"
@@ -498,7 +498,7 @@ function App() {
           </a>
           <span className="mx-2">·</span>
           <a
-            href="https://github.com/andreycruz16/pastepaste"
+            href="https://github.com/markandreydc/pastepaste"
             target="_blank"
             rel="noreferrer"
             className="inline-flex items-center gap-1 font-medium text-[#30372b] underline-offset-2 transition hover:underline dark:text-[#d5d8ce]"

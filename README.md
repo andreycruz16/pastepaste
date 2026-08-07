@@ -46,20 +46,20 @@ Build and push the API image to Docker Hub:
 ```bash
 docker buildx build \
   --platform linux/amd64,linux/arm64 \
-  -t andreycruz16/pastepaste-api:latest \
-  -t andreycruz16/pastepaste-api:$(git rev-parse --short HEAD) \
+  -t markandreydc/pastepaste-api:latest \
+  -t markandreydc/pastepaste-api:$(git rev-parse --short HEAD) \
   --push .
 ```
 
 And to GitHub Container Registry (use your GitHub PAT as the password):
 
 ```bash
-docker login ghcr.io -u andreycruz16
+docker login ghcr.io -u markandreydc
 
 docker buildx build \
   --platform linux/amd64,linux/arm64 \
-  -t ghcr.io/andreycruz16/pastepaste-api:latest \
-  -t ghcr.io/andreycruz16/pastepaste-api:$(git rev-parse --short HEAD) \
+  -t ghcr.io/markandreydc/pastepaste-api:latest \
+  -t ghcr.io/markandreydc/pastepaste-api:$(git rev-parse --short HEAD) \
   --push .
 ```
 
