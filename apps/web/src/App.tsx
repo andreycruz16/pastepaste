@@ -276,9 +276,12 @@ function App() {
           <ThemeToggle dark={dark} onToggle={() => setDark(!dark)} />
         </div>
         <div className="w-full max-w-md text-center">
-          <div className="mb-5 text-2xl font-bold tracking-[-0.055em] text-[#171a12] dark:text-[#e8e5df]">
+          <div className="mb-2 text-2xl font-bold tracking-[-0.055em] text-[#171a12] dark:text-[#e8e5df]">
             paste<span className="text-[#78951d] dark:text-[#d2f36b]">paste</span>
           </div>
+          <p className="mb-5 text-sm text-[#687064] dark:text-[#989c91]">
+            Share text between devices in the same room — end-to-end encrypted and gone when you leave.
+          </p>
           <p className="text-sm text-[#687064] dark:text-[#989c91]">{busy ? status : error}</p>
           {!busy && error && (
             <div className="mt-5 flex justify-center">
@@ -299,14 +302,19 @@ function App() {
     <main className="min-h-dvh bg-[#f8f8f5] px-5 py-4 text-[#171a12] pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] dark:bg-[#10110f] dark:text-[#e8e5df] sm:px-8 sm:py-8">
       <div className="mx-auto flex min-h-dvh max-w-5xl flex-col">
         <header className="flex items-center justify-between border-b border-black/10 pb-4 pt-4 dark:border-white/10 sm:pb-6 sm:pt-6">
-          <button
-            type="button"
-            onClick={() => window.location.assign('/')}
-            title="Generate new code"
-            className="cursor-pointer text-2xl font-bold tracking-[-0.055em] text-[#171a12] transition hover:opacity-70 dark:text-[#e8e5df]"
-          >
-            paste<span className="text-[#78951d] dark:text-[#d2f36b]">paste</span>
-          </button>
+          <div className="flex items-baseline gap-3">
+            <button
+              type="button"
+              onClick={() => window.location.assign('/')}
+              title="Generate new code"
+              className="cursor-pointer text-2xl font-bold tracking-[-0.055em] text-[#171a12] transition hover:opacity-70 dark:text-[#e8e5df]"
+            >
+              paste<span className="text-[#78951d] dark:text-[#d2f36b]">paste</span>
+            </button>
+            <p className="hidden text-xs text-[#687064] dark:text-[#989c91] lg:block">
+              Private, encrypted, ephemeral.
+            </p>
+          </div>
           <div className="flex items-center gap-2 text-xs text-[#687064] dark:text-[#989c91] sm:gap-3">
             {status === 'Connected' ? (
               <span
@@ -424,7 +432,7 @@ function App() {
               ref={textareaRef}
               value={text}
               onChange={(event) => void updateText(event.target.value)}
-              placeholder="Paste or type something here..."
+              placeholder="Share text between devices in the same room — end-to-end encrypted and gone when you leave."
               className="min-h-[40vh] flex-1 resize-none bg-transparent p-6 text-base leading-7 text-[#20251d] outline-none placeholder:text-[#9da49a] dark:text-[#f1f0eb] dark:placeholder:text-[#62675d] sm:min-h-[55vh] sm:p-8"
               autoFocus
             />
